@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "react-use";
-import { updateSearchCount } from "./appwrite";
+import { getTrendingMovies, updateSearchCount } from "./appwrite";
 import MovieCard from "./components/MovieCard";
 import Search from "./components/Search";
 import Spinner from "./components/Spinner";
@@ -17,16 +17,21 @@ const API_OPTIONS = {
 };
 
 export default function App() {
+  // STATE
   // Track user input, API state, and debounced value used for querying TMDB.
-  const [searchTerm, setSearchTerm] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [movieList, setMovieList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [debouncedSearchItem, setDebouncedSearchItem] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [movieList, setMovieList] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   // Throttle rapid keystrokes to avoid spamming the API with requests.
   useDebounce(() => setDebouncedSearchItem(searchTerm), 500, [searchTerm]);
 
+  // COMPORTEMENTS
   // Fetch either a search result set or a default popular list.
   const fetchMovies = async (query = "") => {
     setIsLoading(true);
@@ -51,9 +56,7 @@ export default function App() {
 
       setMovieList(data.results || []);
 
-      console.log("coucou");
       if (query && data.results.length > 0) {
-        console.log("cuicui");
         await updateSearchCount(query, data.results[0]);
       }
     } catch (error) {
@@ -64,11 +67,25 @@ export default function App() {
     }
   };
 
+  const loadTrendingMovies = async () => {
+    try {
+      const movies = await getTrendingMovies();
+      setTrendingMovies(movies);
+    } catch (error) {
+      console.log(`Error fetching trending movies: ${error}`);
+    }
+  };
+
   // Trigger fetch whenever the debounced search term changes.
   useEffect(() => {
     fetchMovies(debouncedSearchItem);
   }, [debouncedSearchItem]);
 
+  useEffect(() => {
+    loadTrendingMovies();
+  }, []);
+
+  // RENDER
   // Render hero, search, and movie results with loading / error states.
   return (
     <main>
@@ -84,8 +101,22 @@ export default function App() {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
 
+        {trendingMovies.length > 0 && (
+          <section className="trending">
+            <h2>Trending Movies</h2>
+            <ul>
+              {trendingMovies.map((movie, index) => (
+                <li key={movie.$id}>
+                  <p>{index + 1}</p>
+                  <img src={movie.poster_url} alt={movie.title} />{" "}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <section className="all-movies">
-          <h2 className="mt-[40px]">All Movies</h2>
+          <h2>All Movies</h2>
 
           {isLoading ? (
             <Spinner />
