@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "react-use";
+import { updateSearchCount } from "./appwrite";
 import MovieCard from "./components/MovieCard";
 import Search from "./components/Search";
 import Spinner from "./components/Spinner";
@@ -49,6 +50,12 @@ export default function App() {
       }
 
       setMovieList(data.results || []);
+
+      console.log("coucou");
+      if (query && data.results.length > 0) {
+        console.log("cuicui");
+        await updateSearchCount(query, data.results[0]);
+      }
     } catch (error) {
       console.log(`Error fetching movies: ${error}`);
       setErrorMessage("Error fetching movies. Please try again later.");
