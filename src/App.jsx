@@ -6,6 +6,7 @@ import Spinner from "./components/Spinner";
 
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+// Shared fetch options ensure every request carries the auth header.
 const API_OPTIONS = {
   method: "GET",
   headers: {
@@ -15,16 +16,17 @@ const API_OPTIONS = {
 };
 
 export default function App() {
-  // STATE
+  // Track user input, API state, and debounced value used for querying TMDB.
   const [searchTerm, setSearchTerm] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedSearchItem, setDebouncedSearchItem] = useState("");
 
+  // Throttle rapid keystrokes to avoid spamming the API with requests.
   useDebounce(() => setDebouncedSearchItem(searchTerm), 500, [searchTerm]);
 
-  // COMPORTEMENTS
+  // Fetch either a search result set or a default popular list.
   const fetchMovies = async (query = "") => {
     setIsLoading(true);
     setErrorMessage("");
@@ -55,11 +57,12 @@ export default function App() {
     }
   };
 
+  // Trigger fetch whenever the debounced search term changes.
   useEffect(() => {
     fetchMovies(debouncedSearchItem);
   }, [debouncedSearchItem]);
 
-  // RENDER
+  // Render hero, search, and movie results with loading / error states.
   return (
     <main>
       <div className="pattern"></div>

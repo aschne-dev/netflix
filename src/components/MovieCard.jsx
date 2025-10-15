@@ -1,11 +1,10 @@
+// Display a single movie entry with sensible fallbacks for incomplete data.
 export default function MovieCard({
   movie: { title, vote_average, poster_path, release_date, original_language },
 }) {
-  // STATE
-
-  // RENDER
   return (
     <div className="movie-card">
+      {/* Use TMDB poster when available; fallback image prevents broken UI */}
       <img
         src={
           poster_path
@@ -23,6 +22,7 @@ export default function MovieCard({
             <p>{vote_average ? vote_average.toFixed(1) : "N/A"}</p>
           </div>
 
+          {/* Language and release year stay visible even when rating is missing */}
           <span>•</span>
           <p className="lang">{original_language}</p>
 

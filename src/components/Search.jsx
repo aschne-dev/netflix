@@ -1,5 +1,5 @@
+// Controlled search box that pushes user input back up to the parent component.
 export default function Search({ searchTerm, setSearchTerm }) {
-  // RENDER
   return (
     <div className="search">
       <div>
@@ -9,6 +9,7 @@ export default function Search({ searchTerm, setSearchTerm }) {
           type="text"
           placeholder="Search through thousands of movies"
           value={searchTerm}
+          // Mirror every keystroke so the debounced search stays in sync.
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>

@@ -1,3 +1,4 @@
+// Lightweight SVG loader used while API requests are in-flight.
 const Spinner = () => {
   return (
     <div role="status">
@@ -17,6 +18,7 @@ const Spinner = () => {
           fill="currentFill"
         />
       </svg>
+      {/* Keep assistive technologies informed when the spinner is visible */}
       <span className="sr-only">Loading...</span>
     </div>
   );
