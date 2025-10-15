@@ -57,6 +57,7 @@ export default function App() {
       setMovieList(data.results || []);
 
       if (query && data.results.length > 0) {
+        // Record the search against our Appwrite metrics table.
         await updateSearchCount(query, data.results[0]);
       }
     } catch (error) {
@@ -70,6 +71,7 @@ export default function App() {
   const loadTrendingMovies = async () => {
     try {
       const movies = await getTrendingMovies();
+      // Trending rows are already curated server-side; just surface them.
       setTrendingMovies(movies);
     } catch (error) {
       console.log(`Error fetching trending movies: ${error}`);
@@ -107,6 +109,7 @@ export default function App() {
             <ul>
               {trendingMovies.map((movie, index) => (
                 <li key={movie.$id}>
+                  {/* Rank uses index since the list is already sorted descending */}
                   <p>{index + 1}</p>
                   <img src={movie.poster_url} alt={movie.title} />{" "}
                 </li>
