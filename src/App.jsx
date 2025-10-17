@@ -17,6 +17,7 @@ const API_OPTIONS = {
 };
 
 export default function App() {
+  // TEST
   // STATE
   // Track user input, API state, and debounced value used for querying TMDB.
   const [debouncedSearchItem, setDebouncedSearchItem] = useState("");
