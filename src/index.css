@@ -25,6 +25,7 @@
     font-family: "DM Sans", serif;
     font-optical-sizing: auto;
     background: #030014;
+    margin: 0;
   }
 
   h1 {
@@ -39,11 +40,11 @@
     @apply min-h-screen relative bg-primary;
   }
 
-  header {
+  .wrapper > header {
     @apply sm:mt-10 mt-5;
   }
 
-  header img {
+  .wrapper > header img {
     @apply w-full max-w-lg h-auto object-contain mx-auto drop-shadow-md;
   }
 }
@@ -51,6 +52,14 @@
 @layer components {
   .pattern {
     @apply bg-hero-pattern w-full h-screen bg-center bg-cover absolute z-0;
+  }
+
+  .app-header {
+    @apply fixed top-0 left-0 right-0 w-full z-20 bg-primary/80 backdrop-blur-md border-b border-light-100/10;
+  }
+
+  .app-header__content {
+    @apply max-w-7xl mx-auto flex items-center justify-between px-5 xs:px-10 py-4;
   }
 
   .wrapper {
