@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "react-use";
-import { getTrendingMovies, updateSearchCount } from "../../appwrite";
+import { getTrendingMovies, updateSearchCount } from "../../utils/appwrite";
 import MovieCard from "../MovieCard";
 import Search from "../Search";
 import Spinner from "../Spinner";
@@ -23,48 +23,48 @@ export default function HomePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Delay API calls until the user pauses typing
   useDebounce(() => setDebouncedSearchItem(searchTerm), 500, [searchTerm]);
 
-  const fetchMovies = useCallback(
-    async (query = "") => {
-      setIsLoading(true);
-      setErrorMessage("");
+  // Fetch the main movie list, optionally by search term
+  const fetchMovies = useCallback(async (query = "") => {
+    setIsLoading(true);
+    setErrorMessage("");
 
-      try {
-        const endpoint = query
-          ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-          : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+    try {
+      const endpoint = query
+        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
-        const response = await fetch(endpoint, API_OPTIONS);
+      const response = await fetch(endpoint, API_OPTIONS);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch movies");
-        }
-
-        const data = await response.json();
-
-        if (data.Response === "False") {
-          setErrorMessage(data.Error || "Failed to fetch movies");
-          setMovieList([]);
-          return;
-        }
-
-        const results = Array.isArray(data.results) ? data.results : [];
-        setMovieList(results);
-
-        if (query && results.length > 0) {
-          await updateSearchCount(query, results[0]);
-        }
-      } catch (error) {
-        console.log(`Error fetching movies: ${error}`);
-        setErrorMessage("Error fetching movies. Please try again later.");
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch movies");
       }
-    },
-    []
-  );
 
+      const data = await response.json();
+
+      if (data.Response === "False") {
+        setErrorMessage(data.Error || "Failed to fetch movies");
+        setMovieList([]);
+        return;
+      }
+
+      const results = Array.isArray(data.results) ? data.results : [];
+      setMovieList(results);
+
+      if (query && results.length > 0) {
+        await updateSearchCount(query, results[0]);
+      }
+    } catch (error) {
+      console.log(`Error fetching movies: ${error}`);
+      setErrorMessage("Error fetching movies. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Pull aggregated trending data from Appwrite
   const loadTrendingMovies = useCallback(async () => {
     try {
       const movies = await getTrendingMovies();
@@ -79,6 +79,7 @@ export default function HomePage() {
   }, [debouncedSearchItem, fetchMovies]);
 
   useEffect(() => {
+    // Populate trending carousel as soon as the page mounts
     loadTrendingMovies();
   }, [loadTrendingMovies]);
 

@@ -6,6 +6,7 @@ import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
+    {/* BrowserRouter wires up history handling for the entire app */}
     <BrowserRouter>
       <App />
     </BrowserRouter>
